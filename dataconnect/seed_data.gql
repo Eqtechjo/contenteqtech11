@@ -1,0 +1,97 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This is a seed mutation and should only be run by authenticated users to populate initial data.") {
+  user_insertMany(data: [
+    {
+      id: "7a2b9d3e-4f1c-4a8b-9e0d-1f2a3b4c5d6e",
+      displayName: "Alice Smith",
+      email: "alice.smith@example.com",
+      role: "Editor",
+      department: "Content",
+      photoUrl: "https://example.com/alice.jpg"
+    },
+    {
+      id: "8c7d6e5a-2b1f-4c3d-5e6f-7a8b9c0d1e2f",
+      displayName: "Bob Johnson",
+      email: "bob.johnson@example.com",
+      role: "Reviewer",
+      department: "Editorial",
+      photoUrl: "https://example.com/bob.jpg"
+    }
+  ])
+  contentType_insertMany(data: [
+    {
+      id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      name: "Article",
+      description: "Standard news article format",
+      createdAt: "2023-10-27T10:00:00Z"
+    },
+    {
+      id: "2e1d4c3b-6f5e-8a7b-0d9c-2f1e4a3b6d5c",
+      name: "Blog Post",
+      description: "Informal blog post content",
+      createdAt: "2023-10-27T10:05:00Z"
+    }
+  ])
+  contentPiece_insertMany(data: [
+    {
+      id: "3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d",
+      title: "The Future of AI",
+      status: "Published",
+      createdAt: "2023-10-28T11:00:00Z",
+      contentTypeId: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d", # Article
+      creatorId: "7a2b9d3e-4f1c-4a8b-9e0d-1f2a3b4c5d6e", # Alice Smith
+      assigneeId: "8c7d6e5a-2b1f-4c3d-5e6f-7a8b9c0d1e2f", # Bob Johnson
+      content: "Artificial intelligence is rapidly evolving...",
+      publicationDate: "2023-10-29T09:00:00Z",
+      description: "An in-depth article on AI trends.",
+      externalLink: "https://example.com/ai-article"
+    },
+    {
+      id: "4d3c2b1a-8f7e-0b9a-2d1c-4f3e2a1b8d7c",
+      title: "My First Blog Post",
+      status: "Draft",
+      createdAt: "2023-10-28T12:00:00Z",
+      contentTypeId: "2e1d4c3b-6f5e-8a7b-0d9c-2f1e4a3b6d5c", # Blog Post
+      creatorId: "8c7d6e5a-2b1f-4c3d-5e6f-7a8b9c0d1e2f", # Bob Johnson
+      assigneeId: "7a2b9d3e-4f1c-4a8b-9e0d-1f2a3b4c5d6e", # Alice Smith
+      content: "Starting my blogging journey...",
+      description: "Personal reflections on getting started with blogging."
+    }
+  ])
+  comment_insertMany(data: [
+    {
+      text: "Great insights on AI!",
+      createdAt: "2023-10-29T10:30:00Z",
+      contentPieceId: "3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d",
+      userId: "8c7d6e5a-2b1f-4c3d-5e6f-7a8b9c0d1e2f"
+    },
+    {
+      text: "Looking forward to more posts!",
+      createdAt: "2023-10-29T13:45:00Z",
+      contentPieceId: "4d3c2b1a-8f7e-0b9a-2d1c-4f3e2a1b8d7c",
+      userId: "7a2b9d3e-4f1c-4a8b-9e0d-1f2a3b4c5d6e"
+    }
+  ])
+  contentField_insertMany(data: [
+    {
+      name: "Main Content",
+      type: "Rich Text",
+      isRequired: true,
+      contentTypeId: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d", # Article
+      placeholder: "Enter the main article content here"
+    },
+    {
+      name: "Excerpt",
+      type: "Short Text",
+      isRequired: false,
+      contentTypeId: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d", # Article
+      placeholder: "A brief summary of the article"
+    },
+    {
+      name: "Author Bio",
+      type: "Rich Text",
+      isRequired: false,
+      contentTypeId: "2e1d4c3b-6f5e-8a7b-0d9c-2f1e4a3b6d5c", # Blog Post
+      placeholder: "Tell us about yourself"
+    }
+  ])
+}

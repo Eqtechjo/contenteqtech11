@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="EQTech CMS PRO - Professional Content Management System"
+    />
+    <meta name="color-scheme" content="dark" />
+
+    <title>EQTech CMS PRO</title>
+
+    <!-- Google Fonts - Cairo (optimized for Arabic) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Firebase SDKs - Optimized loading -->
+    <script
+      src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"
+      defer
+    ></script>
+
+    <!-- JSZip (for site generation/downloads) - Lazy loaded -->
+    <script>
+      // Lazy load JSZip only when needed
+      window.loadJSZip = () => {
+        if (!window.JSZip) {
+          const script = document.createElement("script");
+          script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+          script.defer = true;
+          document.head.appendChild(script);
+        }
+      };
+    </script>
+
+    <!-- Flatpickr Date Picker - Lazy loaded -->
+    <script>
+      // Lazy load Flatpickr only when needed
+      window.loadFlatpickr = () => {
+        if (!window.flatpickr) {
+          const script = document.createElement("script");
+          script.src =
+            "https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js";
+          script.defer = true;
+          document.head.appendChild(script);
+        }
+      };
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css.min.css"
+    />
+
+    <!-- Flatpickr CSS (Date Picker) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Firebase Module (with defer for optimal loading) -->
+    <script defer src="js/firebase.js"></script>
+  </head>
+
+  <body>
+    <!-- LOGIN LANDING PAGE -->
+    <div id="loginPage" class="login-page">
+      <div class="login-container">
+        <div class="login-box">
+          <div class="login-header">
+            <h1>EQTech CMS PRO</h1>
+            <p>Professional Content Management System</p>
+          </div>
+
+          <form id="loginForm" class="login-form">
+            <div class="form-group">
+              <label for="loginEmail">
+                <i class="fas fa-envelope"></i> Email
+              </label>
+              <input
+                id="loginEmail"
+                type="email"
+                placeholder="Enter your email"
+                required
+                autofocus
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="loginPassword">
+                <i class="fas fa-lock"></i> Password
+              </label>
+              <input
+                id="loginPassword"
+                type="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="login-btn">
+              <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+          </form>
+
+          <div id="loginError" class="login-error" style="display: none"></div>
+          <div id="loginLoading" class="login-loading" style="display: none">
+            <div class="spinner"></div>
+            <p>Signing in...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADING SPINNER -->
+    <div id="loader">
+      <div class="loader" aria-label="Loading"></div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="container" id="mainApp" style="display: none">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="logo"><i class="fas fa-chart-line"></i> EQTech</div>
+
+        <nav class="menu">
+          <a class="active" href="#" role="button" aria-current="page">
+            <i class="fas fa-dashboard"></i> Dashboard
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button id="logoutBtn" class="logout-btn" title="Sign out">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main" id="mainContent">
+        <!-- DASHBOARD VIEW -->
+        <section
+          id="dashboardView"
+          role="region"
+          aria-label="Clients dashboard"
+        >
+          <!-- TOP BAR -->
+          <div class="topbar">
+            <div class="topbar-search-section">
+              <input
+                class="search"
+                type="search"
+                placeholder="Search clients..."
+                aria-label="Search clients"
+              />
+            </div>
+            <button
+              class="add-btn btn-add-client"
+              onclick="ClientManager.openNewClientForm()"
+              aria-label="Add new client"
+            >
+              <i class="fas fa-plus"></i> Add Client
+            </button>
+          </div>
+
+          <!-- FILTERS & DATE RANGE -->
+          <div class="filters-section">
+            <div class="filters" role="group" aria-label="Filter by status">
+              <button class="filter-btn active" aria-pressed="true">
+                <i class="fas fa-filter"></i> All
+              </button>
+              <button class="filter-btn" aria-pressed="false">
+                <i class="fas fa-star"></i> New
+              </button>
+              <button class="filter-btn" aria-pressed="false">
+                <i class="fas fa-check"></i> Ready
+              </button>
+              <button class="filter-btn" aria-pressed="false">
+                <i class="fas fa-check-double"></i> Done
+              </button>
+            </div>
+
+            <div
+              class="date-filters"
+              role="group"
+              aria-label="Filter by schedule date range"
+            >
+              <div class="date-picker-container">
+                <label for="dateRangePicker">Schedule Date Range:</label>
+                <div class="date-input-wrapper">
+                  <input
+                    id="dateRangePicker"
+                    class="date-range-input"
+                    type="text"
+                    placeholder="Select date range..."
+                    readonly
+                    aria-label="Select schedule date range"
+                  />
+                  <i class="fas fa-calendar date-picker-icon"></i>
+                </div>
+                <div class="date-range-display" id="dateRangeDisplay"></div>
+              </div>
+              <button
+                type="button"
+                class="filter-btn secondary clear-filter-btn"
+onclick="AuthManager.clearDateFilter()"
+                aria-label="Clear date filter"
+              >
+                <i class="fas fa-times-circle"></i> Clear Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- CLIENTS GRID -->
+          <div id="clients" class="grid" role="list" aria-label="Clients list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL DIALOG -->
+    <div
+      id="modal"
+      class="modal"
+      role="dialog"
+      aria-labelledby="modal-title"
+      aria-modal="true"
+    >
+      <div class="modal-content">
+        <button
+          class="close-btn"
+          onclick="UI.closeModal()"
+          aria-label="Close dialog"
+          type="button"
+        >
+          ✖
+        </button>
+
+        <h2 id="modal-title">Client Profile</h2>
+
+        <!-- BASIC INFO SECTION -->
+        <div class="section">
+          <h3><i class="fas fa-building"></i> Basic Info</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="logoUpload"
+                >Company Logo
+                <span
+                  class="help-icon"
+                  data-tooltip="Upload a logo. Use lowercase, dashes instead of spaces. Example: company-logo.png"
+                  >?</span
+                ></label
+              >
+              <div class="logo-upload-container">
+                <input
+                  id="logoUpload"
+                  type="file"
+                  accept="image/*"
+                  class="logo-input"
+                  aria-label="Upload company logo"
+                />
+                <div class="logo-preview" id="logoPreview">
+                  <i class="fas fa-image"></i>
+                  <p>Click to upload logo (PNG, JPG, GIF)</p>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="companyName"
+                >Company Name
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter the official company name as it appears publicly. Example: EQtech"
+                  >?</span
+                ></label
+              >
+              <input
+                id="companyName"
+                type="text"
+                placeholder="Enter company name"
+                aria-label="Company name"
+              />
+            </div>
+            <div class="form-group">
+              <label for="businessType"
+                >Business Type
+                <span
+                  class="help-icon"
+                  data-tooltip="Specify the industry or category. Example: Technology, Retail, Services"
+                  >?</span
+                ></label
+              >
+              <input
+                id="businessType"
+                type="text"
+                placeholder="e.g., Technology, Retail, Services"
+                aria-label="Business type"
+              />
+            </div>
+            <div class="form-group">
+              <label for="phone"
+                >Phone
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter a valid phone number with country code if possible. Example: +962782993927"
+                  >?</span
+                ></label
+              >
+              <div id="phoneContainer">
+                <div class="phone-input-group">
+                  <input
+                    type="tel"
+                    class="phone-input"
+                    placeholder="Enter phone number"
+                    aria-label="Phone number"
+                  />
+                  <button
+                    type="button"
+                    class="remove-phone-btn"
+                    onclick="removePhoneNumber(this)"
+                    style="display: none"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="add-btn"
+                onclick="addPhoneNumber()"
+                style="margin-top: 8px"
+              >
+                + Add Phone
+              </button>
+            </div>
+            <div class="form-group">
+              <label for="email"
+                >Email
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter a valid business email. Example: admin@company.com"
+                  >?</span
+                ></label
+              >
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter email address"
+                aria-label="Email address"
+              />
+            </div>
+            <div class="form-group">
+              <label for="website"
+                >Website
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter a full URL including https://. Example: https://yourwebsite.com"
+                  >?</span
+                ></label
+              >
+              <input
+                id="website"
+                type="url"
+                placeholder="https://example.com"
+                aria-label="Website URL"
+              />
+            </div>
+            <div class="form-group full-width">
+              <label for="description"
+                >Company Description
+                <span
+                  class="help-icon"
+                  data-tooltip="Briefly describe what the company does. Keep it clear and concise."
+                  >?</span
+                ></label
+              >
+              <textarea
+                id="description"
+                placeholder="Tell us about your company..."
+                aria-label="Company description"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERVICES SECTION -->
+        <div class="section">
+          <h3>
+            Services / Products
+            <span
+              class="help-icon"
+              data-tooltip="List services or products offered. Each item separately. Example: Web Development, Digital Marketing"
+              >?</span
+            >
+          </h3>
+          <div
+            id="servicesContainer"
+            role="group"
+            aria-label="Services list"
+          ></div>
+          <button
+            class="add-btn"
+            onclick="ServiceManager.addService()"
+            type="button"
+          >
+            + Add Service
+          </button>
+        </div>
+
+        <!-- CONTACT INFO SECTION -->
+        <div class="section">
+          <h3>Contact Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="address"
+                >Address
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter full address including city and area. Example: Amman, Jordan - Mecca Street"
+                  >?</span
+                ></label
+              >
+              <input
+                id="address"
+                type="text"
+                placeholder="Enter physical address"
+                aria-label="Physical address"
+              />
+            </div>
+            <div class="form-group">
+              <label for="googleMapsLink"
+                >Google Maps Link
+                <span
+                  class="help-icon"
+                  data-tooltip="Paste Google Maps share link for location preview. Example: https://maps.google.com/..."
+                  >?</span
+                ></label
+              >
+              <input
+                id="googleMapsLink"
+                type="url"
+                placeholder="https://maps.google.com/..."
+                aria-label="Google Maps link"
+                oninput="updateMapPreview()"
+              />
+              <div id="mapPreview" class="map-preview" style="display: none">
+                <iframe
+                  id="mapIframe"
+                  src=""
+                  width="100%"
+                  height="150"
+                  style="border: 0; border-radius: 8px"
+                  allowfullscreen=""
+                  loading="lazy"
+                ></iframe>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="instagram"
+                >Instagram
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter full links only (not usernames). Example: https://instagram.com/yourpage"
+                  >?</span
+                ></label
+              >
+              <input
+                id="instagram"
+                type="url"
+                placeholder="https://instagram.com/username"
+                aria-label="Instagram profile URL"
+              />
+            </div>
+            <div class="form-group">
+              <label for="facebook"
+                >Facebook
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter full links only (not usernames). Example: https://facebook.com/yourpage"
+                  >?</span
+                ></label
+              >
+              <input
+                id="facebook"
+                type="url"
+                placeholder="https://facebook.com/page"
+                aria-label="Facebook profile URL"
+              />
+            </div>
+            <div class="form-group">
+              <label for="whatsapp"
+                >WhatsApp
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter WhatsApp number with country code. Example: +962782993927"
+                  >?</span
+                ></label
+              >
+              <input
+                id="whatsapp"
+                type="tel"
+                placeholder="Enter WhatsApp number"
+                aria-label="WhatsApp number"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- RESPONSIBLE PERSON SECTION -->
+        <div class="section">
+          <h3><i class="fas fa-user-tie"></i> Responsible Person</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="responsibleName"
+                >Name
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter the name of the person responsible for this account"
+                  >?</span
+                ></label
+              >
+              <input
+                id="responsibleName"
+                type="text"
+                placeholder="Enter responsible person name"
+                aria-label="Responsible person name"
+              />
+            </div>
+            <div class="form-group">
+              <label for="responsiblePhone"
+                >Phone
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter phone number of the responsible person"
+                  >?</span
+                ></label
+              >
+              <input
+                id="responsiblePhone"
+                type="tel"
+                placeholder="Enter phone number"
+                aria-label="Responsible person phone"
+              />
+            </div>
+            <div class="form-group">
+              <label for="responsibleEmail"
+                >Email
+                <span
+                  class="help-icon"
+                  data-tooltip="Enter email address of the responsible person"
+                  >?</span
+                ></label
+              >
+              <input
+                id="responsibleEmail"
+                type="email"
+                placeholder="Enter email address"
+                aria-label="Responsible person email"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- UPLOADS SECTION -->
+        <div class="section">
+          <h3>
+            Image Gallery
+            <span
+              class="help-icon"
+              data-tooltip="Upload high-quality images. File naming: use lowercase, dashes instead of spaces (e.g., product-photo.jpg). Avoid random names like IMG_1234.png"
+              >?</span
+            >
+          </h3>
+          <div
+            class="upload-box"
+            onclick="document.getElementById('fileInput').click()"
+            role="button"
+            tabindex="0"
+            aria-label="Upload images - click to select files"
+            onkeydown="
+              if (event.key === 'Enter' || event.key === ' ')
+                document.getElementById('fileInput').click();
+            "
+          >
+            📤 Upload Images / Logo / Profile Photos
+          </div>
+          <input
+            type="file"
+            id="fileInput"
+            multiple
+            accept="image/*"
+            hidden
+            aria-label="File input for images"
+          />
+          <div id="preview" role="region" aria-label="Image preview"></div>
+        </div>
+
+        <!-- STATUS & ACTIONS -->
+        <div class="section">
+          <label for="status-select"
+            >Status
+            <span
+              class="help-icon"
+              data-tooltip="Select the current client status: New (Recently added), Ready (Processing content), Done (Completed)"
+              >?</span
+            ></label
+          >
+          <select id="status-select" aria-label="Client status">
+            <option value="New">New</option>
+            <option value="Ready">Ready</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <button
+          id="saveBtn"
+          class="add-btn save-btn"
+          onclick="ClientManager.saveClientWrapper()"
+          type="button"
+          aria-label="Save client information"
+        >
+          <span class="btn-text"><i class="fas fa-save"></i> Save Client</span>
+          <span class="btn-spinner" style="display: none"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" role="alert" aria-live="polite" aria-atomic="true">
+      <!-- Populated by JavaScript -->
+    </div>
+  </body>
+</html>

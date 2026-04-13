@@ -1,0 +1,55 @@
+query ListAllContentTypes @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only lists content type names and descriptions.") {
+  contentTypes {
+    id
+    name
+    description
+    createdAt
+  }
+}
+
+query GetMyContentPieces($assigneeId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users as it filters content pieces by a user ID.") {
+  contentPieces(where: {assigneeId: {eq: $assigneeId}}) {
+    id
+    title
+    status
+    createdAt
+    publicationDate
+    contentType {
+      name
+    }
+  }
+}
+
+mutation CreateNewComment($contentPieceId: UUID!, $text: String!) @auth(level: USER) {
+  comment_insert(data: {
+    contentPieceId: $contentPieceId,
+    userId_expr: "auth.uid",
+    text: $text,
+    createdAt_expr: "request.time"
+  })
+}
+
+query GetContentPieceWithComments($contentPieceId: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it retrieves a specific content piece and its public comments.") {
+  contentPiece(id: $contentPieceId) {
+    id
+    title
+    description
+    status
+    createdAt
+    publicationDate
+    creator {
+      displayName
+    }
+    contentType {
+      name
+    }
+    comments_on_contentPiece {
+      id
+      text
+      createdAt
+      user {
+        displayName
+      }
+    }
+  }
+}

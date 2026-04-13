@@ -1,0 +1,43 @@
+type User @table {
+  displayName: String!
+  email: String!
+  role: String!
+  photoUrl: String
+  department: String
+}
+
+type ContentType @table {
+  name: String!
+  createdAt: Timestamp!
+  description: String
+}
+
+type ContentPiece @table {
+  title: String!
+  status: String!
+  createdAt: Timestamp!
+  contentType: ContentType
+  assignee: User
+  creator: User
+  content: String
+  publicationDate: Timestamp
+  description: String
+  externalLink: String
+}
+
+type ContentField @table {
+  name: String!
+  type: String!
+  isRequired: Boolean!
+  contentType: ContentType
+  defaultValue: String
+  placeholder: String
+}
+
+type Comment @table {
+  text: String!
+  createdAt: Timestamp!
+  contentPiece: ContentPiece
+  user: User
+  parentCommentId: UUID
+}
