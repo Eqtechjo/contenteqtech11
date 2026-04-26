@@ -1597,33 +1597,34 @@ loadNotes(data.notes || []);
         .map((input) => input.value.trim())
         .filter((phone) => phone);
 const notes = getNotes();
-      const clientData = {
-        name: formData.name,
-        businessType: formData.businessType,
-        phone: phones, // Now an array
-        email: formData.email,
-        description: formData.description,
-        address: formData.address,
-        googleMapsLink: formData.googleMapsLink,
-        website: formData.website,
-        instagram: formData.instagram,
-        facebook: formData.facebook,
-        whatsapp: formData.whatsapp,
-        services: formData.services,
-        images: images,
-        logo: formData.logo || null,
-        status: formData.status,
+
+const clientData = {
+  name: formData.name,
+  businessType: formData.businessType,
+  phone: phones,
+  email: formData.email,
+  description: formData.description,
+  address: formData.address,
+  googleMapsLink: formData.googleMapsLink,
+  website: formData.website,
+  instagram: formData.instagram,
+  facebook: formData.facebook,
+  whatsapp: formData.whatsapp,
+  services: formData.services,
+  images: images,
+  logo: formData.logo || null,
+  status: formData.status,
+
+  notes: notes, // ✅ هون الإضافة الصح
+
   responsiblePerson: {
     name: formData.responsibleName,
     phone: formData.responsiblePhone,
     email: formData.responsibleEmail,
   },
 
-  updated_at: Date.now(),
+  updated_at: Date.now(), // ✅ داخل الأوبجكت مش برا
 };
-        updated_at: Date.now(),
-      };
-
       const editId = AppState.getCurrentEditId();
 
       if (!editId) {
