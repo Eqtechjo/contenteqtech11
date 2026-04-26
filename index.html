@@ -630,6 +630,106 @@ onclick="AuthManager.clearDateFilter()"
           </select>
         </div>
 
+        <!-- NOTES SECTION -->
+<div class="section">
+  <h3>
+    Notes
+    <span class="help-icon" data-tooltip="Add notes with title and description">?</span>
+  </h3>
+
+  <div id="notesContainer"></div>
+
+  <button type="button" class="add-btn" onclick="addNote()">
+    + Add Note
+  </button>
+</div>
+
+<style>
+.note-item {
+  position: relative;
+  padding: 10px;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.note-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+
+.note-grid input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+}
+
+.remove-note-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 14px;
+}
+</style>
+
+<script>
+function addNote(data = {}) {
+  const container = document.getElementById("notesContainer");
+
+  const div = document.createElement("div");
+  div.className = "note-item";
+
+  div.innerHTML = `
+    <div class="note-grid">
+      <input type="text" class="note-title" placeholder="Title" value="${data.title || ""}">
+      <input type="text" class="note-description" placeholder="Description" value="${data.description || ""}">
+    </div>
+
+    <button type="button" class="remove-note-btn" onclick="this.parentElement.remove()">✖</button>
+  `;
+
+  container.appendChild(div);
+}
+
+// GET NOTES (use this in save)
+function getNotes() {
+  const notes = [];
+  document.querySelectorAll(".note-item").forEach(item => {
+    const title = item.querySelector(".note-title").value.trim();
+    const description = item.querySelector(".note-description").value.trim();
+
+    if (title || description) {
+      notes.push({ title, description });
+    }
+  });
+  return notes;
+}
+// LOAD NOTES (use this when editing)
+function loadNotes(notes = []) {
+  const container = document.getElementById("notesContainer");
+  container.innerHTML = "";
+
+  if (notes.length === 0) {
+    addNote();
+  } else {
+    notes.forEach(n => addNote(n));
+  }
+}
+  document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && e.target.classList.contains("note-description")) {
+    e.preventDefault();
+    addNote();
+  }
+});
+</script>
         <!-- SAVE BUTTON -->
         <button
           id="saveBtn"
