@@ -1431,7 +1431,7 @@ const ClientManager = {
       requestAnimationFrame(() => {
         UI.clearForm();
         UI.setFormData(data);
-
+loadNotes(data.notes || []);
         // Defer image loading to prevent blocking
         setTimeout(() => {
           this.loadClientImages(data.images || []);
@@ -1596,7 +1596,7 @@ const ClientManager = {
       const phones = Array.from(phoneInputs)
         .map((input) => input.value.trim())
         .filter((phone) => phone);
-
+const notes = getNotes();
       const clientData = {
         name: formData.name,
         businessType: formData.businessType,
@@ -1613,11 +1613,14 @@ const ClientManager = {
         images: images,
         logo: formData.logo || null,
         status: formData.status,
-        responsiblePerson: {
-          name: formData.responsibleName,
-          phone: formData.responsiblePhone,
-          email: formData.responsibleEmail,
-        },
+  responsiblePerson: {
+    name: formData.responsibleName,
+    phone: formData.responsiblePhone,
+    email: formData.responsibleEmail,
+  },
+
+  updated_at: Date.now(),
+};
         updated_at: Date.now(),
       };
 
